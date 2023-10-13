@@ -32,11 +32,7 @@ const clrmatrx = (numSteps = 30, saturation = 100, lightness = 50) => {
   return grid;
 };
 
-const hsbToRgb = (
-  hue: number,
-  saturation: number,
-  lightness: number
-): RGBColor => {
+const hsbToRgb = (hue: number, saturation: number, lightness: number): RGBColor => {
   const chroma = (lightness * saturation) / 100;
   const huePrime = hue / 60;
   const secondLargestComponent = 1 - Math.abs((huePrime % 2) - 1);
@@ -79,8 +75,8 @@ const hsbToRgb = (
 };
 
 enum PaintMode {
-  CLI = "cli",
-  HTML = "html",
+  CLI = 'cli',
+  HTML = 'html',
 }
 type PaintOptions = {
   angle?: number; // broken
@@ -96,7 +92,7 @@ const paint = (input: string, opts: PaintOptions = {}) => {
     angle: 180,
     saturation: 100,
     lightness: 86,
-    filler: " ",
+    filler: ' ',
     mode: PaintMode.CLI,
   };
   Object.assign(defaults, opts);
@@ -122,9 +118,9 @@ const paint = (input: string, opts: PaintOptions = {}) => {
 
   // input to matrix
   const mtrx = input
-    .split("\n")
+    .split('\n')
     .filter((r) => r.length > 0)
-    .map((r) => r.split(""));
+    .map((r) => r.split(''));
 
   // maximum row length
   let steps = mtrx.length;
@@ -137,7 +133,7 @@ const paint = (input: string, opts: PaintOptions = {}) => {
   // paint
   const out: string[] = [];
   for (let y = 0; y < mtrx.length; y++) {
-    let row: string = "";
+    let row: string = '';
     for (let x = 0; x < mtrx[y].length; x++) {
       // colors are hue, saturation, lightness from texture
       const { h, s, l } = texture[y][x];
@@ -145,10 +141,10 @@ const paint = (input: string, opts: PaintOptions = {}) => {
       let { r, g, b } = hsbToRgb(h, s, l);
       // paint a pixel
       const c = mtrx?.[y]?.[x] || filler;
-      let hex = "";
+      let hex = '';
       // and output it
       if (mode == PaintMode.HTML) {
-        const t = (v: number) => v.toString(16).padStart(2, "0");
+        const t = (v: number) => v.toString(16).padStart(2, '0');
         hex = `${t(r)}${t(g)}${t(b)}`;
       }
       if (c == opts.skip) {
@@ -157,18 +153,18 @@ const paint = (input: string, opts: PaintOptions = {}) => {
         row += template(mode, { r, g, b, y, x, c, hex });
       }
     }
-    if (mode == "cli") {
+    if (mode == 'cli') {
       out.push(row);
     } else {
       out.push(`<span class="r r${y}">${row}</span>`);
     }
   }
-  return out.join("\n");
+  return out.join('\n');
 };
 
 const teapot = `
-                                  
-                  
+                                  \n
+
                ⡿⠛⠛
              ⡿⠧⠀⠀⠿⢿
    ⠿⠿⢿    ⡿⠿⣧⣤⣤⣤⣤⣤⣤⣾⠿
@@ -180,7 +176,7 @@ const teapot = `
         ⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣻⣷⣶⣾
           ⡻⠶⣶⣤⣤⣤⣤⣤⣴⡶⠶⢟
             ⣦⣄⣀⣀⣀⣀⣀⣀⣤`;
-const ima = "imateapot";
+const ima = 'imateapot';
 export const CliTeapot = `${paint(teapot, {
   mode: PaintMode.CLI,
 })}\n            \u001b[38;2;255;171;112m${ima}\u001b[0m`;
@@ -208,7 +204,7 @@ export const Home = `
         const memo = [];
         return (numSteps, saturation = 100, lightness = 50) => {
           if (memo[numSteps]) return memo[numSteps];
-      
+
           const colors = [];
           for (let i = 0; i < numSteps; i++) {
             const hue = (i / numSteps) * 360;
@@ -237,7 +233,7 @@ export const Home = `
         }
         return newMatrix;
       };
-      
+
       const rollz = (grid, interval, angle = 360) => {
         let toggle = true
         let colorIndex = 0;
@@ -265,7 +261,7 @@ export const Home = `
         }
 
         start();
-        return () => { 
+        return () => {
           toggle = !toggle;
           if(!toggle && handle) {
             clearInterval(handle)
@@ -273,9 +269,9 @@ export const Home = `
           } else { start(); }
         }
       }
-      
+
       window.toggle = rollz(document.getElementById('teapot').children, 66);
-      
+
     </script>
   </body>
 </html>`;
