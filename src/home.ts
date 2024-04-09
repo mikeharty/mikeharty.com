@@ -161,6 +161,7 @@ const paint = (input: string, opts: PaintOptions = {}) => {
   }
   return out.join('\n');
 };
+const ima = `<span class="r r13" "style="color:#FFAB70"><span class="c y12 x3" style="margin-left:-3px">418</span></span>`;
 
 const teapot = `
                                   \n
@@ -171,17 +172,15 @@ const teapot = `
  ⡟⢀⣴⣶⣤⣼⠟⠛⠷⠶⢤⣤⣤⣤⣤⣤⣤⡤⠶⠾⠛⠻  ⠁⠀⢀⣨⣿
  ⡇⢸   ⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹ ⠀⠀
  ⡇⠸   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡶⠶⠟⠀⠀⢿
-  ⣦⣈⢹⣧⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣼⡏⠀⠀⠀⠀⠀⢸
+  ⣦⣈⢹⣧⠀⠀⠀⠀⠀   418⠀⠀ ⠀⣼⡏⠀⠀⠀⠀⠀⢸
        ⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣇⠀⠀⠀⠀⣠
-        ⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣻⣷⣶⣾
+        ⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣻⣷⣶⣾⠀
           ⡻⠶⣶⣤⣤⣤⣤⣤⣴⡶⠶⢟
             ⣦⣄⣀⣀⣀⣀⣀⣀⣤`;
-const ima = 'imateapot';
 export const CliTeapot = `${paint(teapot, {
   mode: PaintMode.CLI,
 })}\n            \u001b[38;2;255;171;112m${ima}\u001b[0m`;
-const HtmlTeapot = `${paint(teapot, { mode: PaintMode.HTML })}
-<span class="r r13" "style="color:#FFAB70"><span class="c y12 x3">             ${ima}</span></span>`;
+const HtmlTeapot = `${paint(teapot, { mode: PaintMode.HTML })}`;
 
 export const Home = `
 <html>
@@ -197,7 +196,7 @@ export const Home = `
       }
     </style>
   </head>
-  <body style="background:#000;color:#fff">
+  <body style="background:#b3dbff;color:#fff">
     <pre id="teapot">${HtmlTeapot}</pre>
     <script type="text/javascript">
       const rainbz = (() => {
