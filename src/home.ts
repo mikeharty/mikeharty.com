@@ -1,3 +1,7 @@
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import ENV from './env';
+
 type HSLColor = { h: number; s: number; l: number };
 type RGBColor = { r: number; g: number; b: number };
 
@@ -82,9 +86,7 @@ type PaintOptions = {
   angle?: number; // broken
   saturation?: number;
   lightness?: number;
-  filler?: string; // fill empty cells
   mode?: PaintMode;
-  skip?: string; // char to skip
 };
 const paint = (input: string, opts: PaintOptions = {}) => {
   // configuration
@@ -92,11 +94,10 @@ const paint = (input: string, opts: PaintOptions = {}) => {
     angle: 180,
     saturation: 100,
     lightness: 86,
-    filler: ' ',
     mode: PaintMode.CLI,
   };
   Object.assign(defaults, opts);
-  const { saturation, lightness, filler, mode } = defaults;
+  const { saturation, lightness, mode } = defaults;
 
   // templates
   type TemplateOptions = {
@@ -112,7 +113,7 @@ const paint = (input: string, opts: PaintOptions = {}) => {
     const { r, g, b, y, x, c, hex } = opts;
     return {
       cli: `\u001b[38;2;${r};${g};${b}m${c}\u001b[0m`,
-      html: `<span class="y${y} x${x} c" style="color:#${hex}">${c}</span>`,
+      html: `<span class="y${y} x${x} c" style="color:#${hex};">${c}</span>`,
     }[mode];
   };
 
@@ -132,6 +133,7 @@ const paint = (input: string, opts: PaintOptions = {}) => {
   const texture = clrmatrx(steps, saturation, lightness);
   // paint
   const out: string[] = [];
+
   for (let y = 0; y < mtrx.length; y++) {
     let row: string = '';
     for (let x = 0; x < mtrx[y].length; x++) {
@@ -140,14 +142,23 @@ const paint = (input: string, opts: PaintOptions = {}) => {
       // convert colors to rgb
       let { r, g, b } = hsbToRgb(h, s, l);
       // paint a pixel
-      const c = mtrx?.[y]?.[x] || filler;
+      const c = mtrx?.[y]?.[x] || ' ';
+
+      if (c == '!') {
+        const end = mtrx[y].lastIndexOf('!');
+        const sp = mtrx[y].slice(x + 1, end).join('');
+        row += `<span class="sp">${sp}</span>`;
+        x = end;
+        continue;
+      }
+
       let hex = '';
-      // and output it
       if (mode == PaintMode.HTML) {
         const t = (v: number) => v.toString(16).padStart(2, '0');
         hex = `${t(r)}${t(g)}${t(b)}`;
       }
-      if (c == opts.skip) {
+
+      if (c == ' ') {
         row += c;
       } else {
         row += template(mode, { r, g, b, y, x, c, hex });
@@ -161,116 +172,47 @@ const paint = (input: string, opts: PaintOptions = {}) => {
   }
   return out.join('\n');
 };
-const ima = `<span class="r r13" "style="color:#FFAB70"><span class="c y12 x3" style="margin-left:-3px">418</span></span>`;
+const teapot = `                                                                           
+                                   .o,                                     
+                                  o8o.c                                    
+                                 )@8CoC(                                   
+                                  8@ccC                            abb     
+         .oooo.,                ..o@8@o..                        .8@@V     
+      .oO*:.'"***coo,    .o88@88C\`cc:cc'C88@8@cc,              .\`88@\`      
+     .o.:oo.....::ooOOCo'**@@8@88@CoCoC@88@8@@**cCO.          8oCCO\`       
+     o:c8@@@@88@Coo88@88O8OOCO**8@8CcC8@8**ccccococoo.       8cooC8        
+     8cc*8    '88o888O8OOCOCCoCoococc:c:c:::::c:c:ccoc'.   .8:c:c8         
+     8o o8      8@@@88O8OOCOCCoooocccc:c:::::::c:cccco8@8@@8.:.:8\`         
+     ;C.:C,    .@8@88O8OOCCoCoococc:c::.:.....:.::c:c@8CO8@.. ..8          
+      ;o.:C;   8@@8@88O8OOCCoCoococc::.:.. . ..:.::cc@CCoc@..:.8\`          
+       '8o:C8, @@8@88OOOOCCoCoocccc::.:..     ..:.::c8@8CO88o.c*           
+        'C8CO8*@@@8@88O8OOCCoCoococc::.:.. . ..:.::cco'@8@@8@*\`            
+         '@8CCO@@8@88O8OOCCoCoococc:c::.:.....:.::c:ccoc;88\`               
+           '@88@@@@@88O8OOCOCCoooocccc:c:::::::c:ccccoooo8                 
+             '@C@@@88O8OOCOCCoCoococc:c:c:::::c:c:ccocooC\`                 
+               '*@@@8@88O8OOCOCCoCoocococccccccococooCo8\`                  
+                 '8@@88O8OOCOCCoCoooocococococococoocC'                    
+                   '*8@8@88O8OOCOCCCCoCoCoooooooCoCC8\`                     
+                     "@8@888@8OOCOCCCCoCoCoCoCoCc8c\'                       
+                       '8@a !418: I'm a teapot! cC8\`                         
+                         *8@8C@8@@@8@@8@8CCCc**\`                           `;
 
-const teapot = `
-                                  \n
+export const CliTeapot = paint(teapot, { mode: PaintMode.CLI });
+export const HtmlTeapot = paint(teapot, { mode: PaintMode.HTML });
 
-               ⡿⠛⠛
-             ⡿⠧⠀⠀⠿⢿
-   ⠿⠿⢿    ⡿⠿⣧⣤⣤⣤⣤⣤⣤⣾⠿
- ⡟⢀⣴⣶⣤⣼⠟⠛⠷⠶⢤⣤⣤⣤⣤⣤⣤⡤⠶⠾⠛⠻  ⠁⠀⢀⣨⣿
- ⡇⢸   ⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠹ ⠀⠀
- ⡇⠸   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡶⠶⠟⠀⠀⢿
-  ⣦⣈⢹⣧⠀⠀⠀⠀⠀   418⠀⠀ ⠀⣼⡏⠀⠀⠀⠀⠀⢸
-       ⡄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢻⣇⠀⠀⠀⠀⣠
-        ⣦⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣻⣷⣶⣾⠀
-          ⡻⠶⣶⣤⣤⣤⣤⣤⣴⡶⠶⢟
-            ⣦⣄⣀⣀⣀⣀⣀⣀⣤`;
-export const CliTeapot = `${paint(teapot, {
-  mode: PaintMode.CLI,
-})}\n            \u001b[38;2;255;171;112m${ima}\u001b[0m`;
-const HtmlTeapot = `${paint(teapot, { mode: PaintMode.HTML })}`;
-
-export const Home = `
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>i'm a teapot</title>
-    <style type="text/css">
-      #teapot {
-        font-family: monospace;
-        font-size: 1.5em;
-        width: 405px;
-        margin: 100px auto;
-      }
-    </style>
-  </head>
-  <body style="background:#b3dbff;color:#fff">
-    <pre id="teapot">${HtmlTeapot}</pre>
-    <script type="text/javascript">
-      const rainbz = (() => {
-        const memo = [];
-        return (numSteps, saturation = 100, lightness = 50) => {
-          if (memo[numSteps]) return memo[numSteps];
-
-          const colors = [];
-          for (let i = 0; i < numSteps; i++) {
-            const hue = (i / numSteps) * 360;
-            const color = { h: Math.floor(hue), s: saturation, l: lightness };
-            colors.push(color);
-          }
-          memo[numSteps] = colors;
-          return colors;
-        };
-      })();
-      const rotateMatrix = (matrix, angle) => {
-        const newMatrix = [];
-        for (let i = 0; i < matrix.length; i++) {
-          newMatrix.push([]);
-          for (let j = 0; j < matrix[i].length; j++) {
-            const x = j * Math.cos(angle) - i * Math.sin(angle);
-            const y = j * Math.sin(angle) + i * Math.cos(angle);
-            const row = Math.floor(y);
-            const col = Math.floor(x);
-            if (row >= 0 && row < matrix.length && col >= 0 && col < matrix[row].length) {
-              newMatrix[i].push(matrix[row][col]);
-            } else {
-              newMatrix[i].push(0);
-            }
-          }
-        }
-        return newMatrix;
-      };
-
-      const rollz = (grid, interval, angle = 360) => {
-        let toggle = true
-        let colorIndex = 0;
-        let handle = null;
-
-        const skip = Array.from(Array(grid.length), _ => Array(grid[0].children.length).fill(0));
-        for(let i = 0; i < grid.length; i++) {
-          for(let j = 0; j < grid[i].children.length; j++) {
-            if(!(grid?.[i]?.children?.[j]) || grid[i].children[j].innerText == ' ') { skip[i][j] = 1; }
-          }
-        }
-
-        const start = () => {
-          handle = setInterval(() => {
-            colorIndex = (colorIndex + 1) % grid[0].children.length;
-            const colors = rainbz(grid[0].children.length, 100, 50, angle).slice(colorIndex).concat(rainbz(grid[0].children.length, 100, 50, angle).slice(0, colorIndex));
-            for (let i = 0; i < grid.length; i++) {
-              for (let j = 0; j < grid[i].children.length; j++) {
-                if(skip[i][j]) { continue; }
-                grid[i].children[j].style.color = \`hsl(\${colors[j].h}deg \${colors[j].s}% \${colors[j].l}%)\`;
-                grid[i].children[j].style.textShadow = \`0 2px 10px hsl(\${colors[j].h}deg \${colors[j].s}% \${colors[j].l}%)\`;
-              }
-            }
-          }, interval);
-        }
-
-        start();
-        return () => {
-          toggle = !toggle;
-          if(!toggle && handle) {
-            clearInterval(handle)
-            handle = null;
-          } else { start(); }
-        }
-      }
-
-      window.toggle = rollz(document.getElementById('teapot').children, 66);
-
-    </script>
-  </body>
-</html>`;
+export const renderHome = async () => {
+  const home = await fs.readFile(path.join(ENV.TEMPLATE_DIR, 'home.html'), 'utf-8');
+  const variablePattern = /\{%([^}]+)%\}/g;
+  const variables = home.match(variablePattern);
+  if (!variables) return home;
+  const replacements = variables.map((v: string) => {
+    const key = v.slice(2, -2).trim();
+    const value = key === 'HtmlTeapot' ? HtmlTeapot : '';
+    return [key, value];
+  });
+  let result = home;
+  replacements.forEach(([key, value]: string[]) => {
+    result = result.replace(new RegExp(`{% ${key} %}`, 'g'), value);
+  });
+  return result;
+};

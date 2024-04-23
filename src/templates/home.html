@@ -1,0 +1,132 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>418: I'm a teapot.</title>
+    <style type="text/css">
+      body {
+        background: #060222;
+        color: #fff;
+      }
+      #teapot {
+        font-family: monospace;
+        font-size: 1.6em;
+        font-weight: 600;
+        width: 885px;
+        margin: 100px auto;
+      }
+      span.sp {
+        display: inline-block;
+      }
+    </style>
+    <script type="text/javascript">
+      const rainbz = (() => {
+        const memo = [];
+        return (numSteps, saturation = 100, lightness = 50) => {
+          if (memo[numSteps]) return memo[numSteps];
+
+          const colors = [];
+          const start = 160;
+          const max = 280;
+          let down = false;
+          for (let i = 0; i < numSteps; i++) {
+            let hue = Math.floor((i / numSteps) * 2 * (max - start));
+            if (hue + start >= max) {
+              down = true;
+            }
+            hue = down ? start + hue : max - hue;
+            const color = { h: hue, s: saturation, l: lightness };
+            colors.push(color);
+          }
+          memo[numSteps] = colors;
+          return colors;
+        };
+      })();
+
+      const rotateMatrix = (matrix, angle) => {
+        const newMatrix = [];
+        for (let i = 0; i < matrix.length; i++) {
+          newMatrix.push([]);
+          const children = Array.from(matrix[i]?.children || []);
+          for (let j = 0; j < children.length; j++) {
+            const x = j * Math.cos(angle) - i * Math.sin(angle);
+            const y = j * Math.sin(angle) + i * Math.cos(angle);
+            const row = Math.floor(y);
+            const col = Math.floor(x);
+            if (row >= 0 && row < matrix.length && col >= 0 && col < children.length) {
+              newMatrix[i].push(children[col]);
+            } else {
+              newMatrix[i].push(0);
+            }
+          }
+        }
+        return newMatrix;
+      };
+
+      const rollz = (grid, frameRate = 30) => {
+        grid = Array.from(grid);
+        const interval = 1000 / frameRate;
+        const colors = rainbz(100, 50);
+        const lineWidth = Math.max(...grid.map((line) => line.textContent.length));
+        const skipGrid = Array.from(Array(grid.length), (_) => Array(lineWidth).fill(0));
+        const sp = document.querySelector('.sp');
+        for (let i = 0; i < grid.length; i++) {
+          const text = grid[i].textContent;
+
+          for (let j = 0; j < lineWidth; j++) {
+            if (text.charAt(j) == '4') {
+              const start = j;
+              const end = text.indexOf('teapot') + 6;
+              for (let j = start; j < end; j++) {
+                skipGrid[i][j] = 1;
+              }
+            } else if (text.charAt(j) == ' ') {
+              skipGrid[i][j] = 1;
+            }
+          }
+        }
+
+        const getColor = (frame, col) => {
+          const color = colors[(col + frame) % colors.length];
+          colors.push(colors.shift());
+          return color;
+        };
+
+        const render = (frame = 0) => {
+          const start = Date.now();
+          sp.style.transform = `rotateX(-${frame % (360 * 5)}deg)`;
+          for (let i = 0; i < grid.length; i++) {
+            const children = Array.from(grid[i]?.children || []).filter(
+              (e) => e.className !== 'sp',
+            );
+            for (let j = 0; j < lineWidth; j++) {
+              const color = getColor(frame, j);
+              if (skipGrid[i][j]) {
+                continue;
+              }
+              if (children.length) {
+                const child = children.pop();
+                child.style.color = `hsl(${color.h}deg ${color.s}% ${color.l}%)`;
+                // rotating text shadow
+                const shadowX = Math.cos(-(frame + j) / 10) * 10;
+                const shadowY = Math.sin(-(frame + j) / 10) * 10;
+                child.style.textShadow = `${shadowX}px ${shadowY}px 10px hsl(${color.h}deg ${color.s}% ${color.l}%)`;
+              }
+            }
+          }
+          setTimeout(() => render(frame + 1), Math.max(0, interval - (Date.now() - start)));
+        };
+
+        return {
+          start: () => render(),
+        };
+      };
+    </script>
+  </head>
+  <body>
+    <pre id="teapot">{% HtmlTeapot %}</pre>
+    <script type="text/javascript">
+      const teapot = document.getElementById('teapot').children;
+      rollz(teapot).start();
+    </script>
+  </body>
+</html>
