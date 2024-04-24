@@ -142,12 +142,12 @@ const paint = (input: string, opts: PaintOptions = {}) => {
       // convert colors to rgb
       let { r, g, b } = hsbToRgb(h, s, l);
       // paint a pixel
-      const c = mtrx?.[y]?.[x] || ' ';
+      const c = mtrx?.[y]?.[x] || ' ';
 
       if (c == '!') {
         const end = mtrx[y].lastIndexOf('!');
         const sp = mtrx[y].slice(x + 1, end).join('');
-        row += `<span class="sp">${sp}</span>`;
+        row += `<span class="hi">${sp}</span>`;
         x = end;
         continue;
       }
@@ -158,7 +158,7 @@ const paint = (input: string, opts: PaintOptions = {}) => {
         hex = `${t(r)}${t(g)}${t(b)}`;
       }
 
-      if (c == ' ') {
+      if (c == ' ') {
         row += c;
       } else {
         row += template(mode, { r, g, b, y, x, c, hex });
@@ -172,30 +172,30 @@ const paint = (input: string, opts: PaintOptions = {}) => {
   }
   return out.join('\n');
 };
-const teapot = `                                                                           
-                                   .o,                                     
-                                  o8o.c                                    
-                                 )@8CoC(                                   
-                                  8@ccC                            abb     
-         .oooo.,                ..o@8@o..                        .8@@V     
-      .oO*:.'"***coo,    .o88@88C\`cc:cc'C88@8@cc,              .\`88@\`      
-     .o.:oo.....::ooOOCo'**@@8@88@CoCoC@88@8@@**cCO.          8oCCO\`       
-     o:c8@@@@88@Coo88@88O8OOCO**8@8CcC8@8**ccccococoo.       8cooC8        
-     8cc*8    '88o888O8OOCOCCoCoococc:c:c:::::c:c:ccoc'.   .8:c:c8         
-     8o o8      8@@@88O8OOCOCCoooocccc:c:::::::c:cccco8@8@@8.:.:8\`         
-     ;C.:C,    .@8@88O8OOCCoCoococc:c::.:.....:.::c:c@8CO8@.. ..8          
-      ;o.:C;   8@@8@88O8OOCCoCoococc::.:.. . ..:.::cc@CCoc@..:.8\`          
-       '8o:C8, @@8@88OOOOCCoCoocccc::.:..     ..:.::c8@8CO88o.c*           
-        'C8CO8*@@@8@88O8OOCCoCoococc::.:.. . ..:.::cco'@8@@8@*\`            
-         '@8CCO@@8@88O8OOCCoCoococc:c::.:.....:.::c:ccoc;88\`               
-           '@88@@@@@88O8OOCOCCoooocccc:c:::::::c:ccccoooo8                 
-             '@C@@@88O8OOCOCCoCoococc:c:c:::::c:c:ccocooC\`                 
-               '*@@@8@88O8OOCOCCoCoocococccccccococooCo8\`                  
-                 '8@@88O8OOCOCCoCoooocococococococoocC'                    
-                   '*8@8@88O8OOCOCCCCoCoCoooooooCoCC8\`                     
-                     "@8@888@8OOCOCCCCoCoCoCoCoCc8c\'                       
-                       '8@a !418: I'm a teapot! cC8\`                         
-                         *8@8C@8@@@8@@8@8CCCc**\`                           `;
+const teapot = `                                   .o,                                     
+                                  o8o.c                                    
+                                 )@8CoC(                                   
+                                  8@ccC                            abb     
+         .oooo.,                ..o@8@o..                        .8@@V     
+      .oO*:.'"***coo,    .o88@88C\`cc:cc'C88@8@cc,              .\`88@\`      
+     .o.:oo.....::ooOOCo'**@@8@88@CoCoC@88@8@@**cCO.          8oCCO\`       
+     o:c8@@@@88@Coo88@88O8OOCO**8@8CcC8@8**ccccococoo.       8cooC8        
+     8cc*8    '88o888O8OOCOCCoCoococc:c:c:::::c:c:ccoc'.   .8:c:c8         
+     8o o8      8@@@88O8OOCOCCoooocccc:c:::::::c:cccco8@8@@8.:.:8\`         
+     ;C.:C,    .@8@88O8OOCCoCoococc:c::.:.....:.::c:c@8CO8@.. ..8          
+      ;o.:C;   8@@8@88O8OOCCoCoococc::.:.. . ..:.::cc@CCoc@..:.8\`          
+       '8o:C8, @@8@88OOOOCCoCoocccc::.:..     ..:.::c8@8CO88o.c*           
+        'C8CO8*@@@8@88O8OOCCoCoococc::.:.. . ..:.::cco'@8@@8@*\`            
+         '@8CCO@@8@88O8OOCCoCoococc:c::.:.....:.::c:ccoc;88\`               
+           '@88@@@@@88O8OOCOCCoooocccc:c:::::::c:ccccoooo8                 
+             '@C@@@88O8OOCOCCoCoococc:c:c:::::c:c:ccocooC\`                 
+               '*@@@8@88O8OOCOCCoCoocococccccccococooCo8\`                  
+                 '8@@88O8OOCOCCoCoooocococococococoocC'                    
+                   '*8@8@88O8OOCOCCCCoCoCoooooooCoCC8\`                     
+                     "@8@888@8OOCOCCCCoCoCoCoCoCc8c\'                       
+                       '8@a !418: I'm a teapot! cC8\`                         
+                         *8@8C@8@@@8@@8@8CCCc**\`                           
+ `;
 
 export const CliTeapot = paint(teapot, { mode: PaintMode.CLI });
 export const HtmlTeapot = paint(teapot, { mode: PaintMode.HTML });

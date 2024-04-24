@@ -41,3 +41,7 @@ dist/**/*
 yarn.lock
 
 static/wallpapers.zip
+static/js/*
+static/css/*
+
+!.gitkeep

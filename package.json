@@ -6,9 +6,10 @@
   "author": "Mike Harty",
   "scripts": {
     "dev": "npx ts-node src/main.ts",
-    "build": "rm -rf ./dist/templates && cp -rf ./src/templates ./dist/ && ./node_modules/typescript/bin/tsc",
+    "build": "./build.sh",
     "run": "node dist/main.js",
-    "format": "npx prettier --write ."
+    "format": "npx prettier --write .",
+    "start": "npm run build && pm2 reload 0"
   },
   "engines": {
     "node": ">=16.0.0"
@@ -24,6 +25,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.8.3",
+    "clean-css-cli": "^5.6.3",
     "nodemon": "^3.0.1",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1"
