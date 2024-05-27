@@ -36,9 +36,7 @@
     </div>
     <script type="text/javascript">
       class t{t=" ";grid=[];h=0;grid=[];i=null;interval=0;l=[];o={u:28,palette:{size:100,M:50,p:50,min:160,max:280},g:"418: I'm a teapot"};constructor(t,s){s={...this.o,...s},this.$=t,this.u=s.u,this.interval=1e3/s.u,this.l=this.m(s.palette),this.g=s.g,this.v(t)}v(t){t=Array.from(t.children),this.h=Math.max(...t.map(t=>t.textContent.length)),this.grid=t.map(t=>{let s=t.textContent;const h=Array.from(t.children);return s.length<this.h&&(s+=this.t.repeat(this.h-s.length)),s.includes(this.g)&&(s.replace(this.g,this.t.repeat(this.g.length)),this.i=t.querySelector(".h")),s.split("").map(t=>t!=this.t&&h.pop()||null)})}loop(a=0){var t;this.enabled&&(t=Date.now(),this.grid.forEach(t=>{t.forEach((t,s)=>{var h,i=this.P(a,s);null!==t&&"h"!=t.className&&(h=10*Math.cos(-(a+s)/10),s=10*Math.sin(-(a+s)/10),t.style.color=`hsl(${i.A}deg ${i.s}% ${i.D}%)`,t.style.textShadow=`${h}px ${s}px 8px hsl(${i.A}deg ${i.s}% ${i.D}%)`)})}),null!==this.i&&(this.i.style.transform=`rotateX(-${a%1800}deg)`),t=Date.now()-t,setTimeout(()=>this.loop(a+1),Math.max(0,this.interval-t)))}start(){this.enabled?console.log("already rainbz"):(this.enabled=!0,this.loop())}stop(){this.enabled=!1}k(t){t={...this.o.palette,...t},this.l=this.m(t)}P(t,s){return t=this.l[(t+s)%this.l.length],this.l.push(this.l.shift()),t}m(t){var{min:s,max:h,size:i,M:a,p:e}=t,r=[];let l=!1;for(let t=0;t<i;t++){var o=Math.floor(t/i*2*(h-s)),o={A:(l=h<=o+s||l)?s+o:h-o,s:a,D:e};r.push(o)}return r}B(h,i){var a=[];for(let s=0;s<h.length;s++){a[s]=[];for(let t=0;t<h[s].length;t++){var e=Math.floor(t*Math.cos(i)-s*Math.sin(i)),r=Math.floor(t*Math.sin(i)+s*Math.cos(i));a[r]=a[r]||[],a[r][e]=h?.[s]?.[t]||null}}return a}}
-      window.addEventListener('load', () => {
-        new t(document.getElementById('t')).start();
-      });
+      new t(document.getElementById('t')).start();
     </script>
   </body>
 </html>
